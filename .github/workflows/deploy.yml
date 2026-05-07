@@ -30,6 +30,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/
           server-dir: /home/futurey8u1w3/public_html/
-          protocol: ftps
+          protocol: ftp
           port: 21
+          security: loose
           dangerous-clean-slate: false
