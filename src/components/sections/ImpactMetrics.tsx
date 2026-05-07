@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useCountUp, useInView } from "../../hooks/useAnimations";
 import { tokens } from "../../styles/tokens";
 
@@ -12,6 +12,7 @@ export default function ImpactMetrics() {
   const [activeIndex, setActiveIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
+  const autoPlayRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const metrics = [
     {
@@ -36,6 +37,25 @@ export default function ImpactMetrics() {
     },
   ];
 
+  const resetAutoPlay = () => {
+    if (autoPlayRef.current) clearInterval(autoPlayRef.current);
+    autoPlayRef.current = setInterval(() => {
+      setActiveIndex((i) => (i + 1) % metrics.length);
+    }, 3500);
+  };
+
+  useEffect(() => {
+    resetAutoPlay();
+    return () => {
+      if (autoPlayRef.current) clearInterval(autoPlayRef.current);
+    };
+  }, []);
+
+  const goTo = (index: number) => {
+    setActiveIndex(index);
+    resetAutoPlay();
+  };
+
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
@@ -49,9 +69,9 @@ export default function ImpactMetrics() {
     if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
 
     if (dx < 0 && activeIndex < metrics.length - 1) {
-      setActiveIndex((i) => i + 1);
+      goTo(activeIndex + 1);
     } else if (dx > 0 && activeIndex > 0) {
-      setActiveIndex((i) => i - 1);
+      goTo(activeIndex - 1);
     }
 
     touchStartX.current = null;
@@ -293,7 +313,6 @@ export default function ImpactMetrics() {
 
         {/* ── Mobile carousel ── */}
         <div className="fra-impact-mobile">
-          {/* Swipeable track */}
           <div
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
@@ -359,11 +378,11 @@ export default function ImpactMetrics() {
             </div>
           </div>
 
-          {/* Navigation row: prev arrow · counter · next arrow */}
+          {/* Navigation row */}
           <div className="fra-impact-mobile-arrows">
             <button
               className="fra-impact-mobile-arrow-btn"
-              onClick={() => setActiveIndex((i) => Math.max(0, i - 1))}
+              onClick={() => goTo(Math.max(0, activeIndex - 1))}
               disabled={activeIndex === 0}
               aria-label="Previous metric"
             >
@@ -384,7 +403,7 @@ export default function ImpactMetrics() {
 
             <button
               className="fra-impact-mobile-arrow-btn"
-              onClick={() => setActiveIndex((i) => Math.min(metrics.length - 1, i + 1))}
+              onClick={() => goTo(Math.min(metrics.length - 1, activeIndex + 1))}
               disabled={activeIndex === metrics.length - 1}
               aria-label="Next metric"
             >
@@ -409,7 +428,7 @@ export default function ImpactMetrics() {
                 aria-selected={i === activeIndex}
                 aria-label={`Go to metric ${i + 1}`}
                 className="fra-impact-mobile-dot"
-                onClick={() => setActiveIndex(i)}
+                onClick={() => goTo(i)}
                 style={{
                   background: i === activeIndex ? tokens.green900 : "#d1d5db",
                   width: i === activeIndex ? 20 : 8,

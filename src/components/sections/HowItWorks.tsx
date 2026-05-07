@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { tokens } from "../../styles/tokens";
 import { useInView } from "../../hooks/useAnimations";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 type JourneyStep = {
   number: string;
@@ -61,6 +61,26 @@ export default function HowItWorks() {
   const [activeIndex, setActiveIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
+  const autoPlayRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const resetAutoPlay = () => {
+    if (autoPlayRef.current) clearInterval(autoPlayRef.current);
+    autoPlayRef.current = setInterval(() => {
+      setActiveIndex((i) => (i + 1) % steps.length);
+    }, 3500);
+  };
+
+  useEffect(() => {
+    resetAutoPlay();
+    return () => {
+      if (autoPlayRef.current) clearInterval(autoPlayRef.current);
+    };
+  }, []);
+
+  const goTo = (index: number) => {
+    setActiveIndex(index);
+    resetAutoPlay();
+  };
 
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
@@ -72,13 +92,12 @@ export default function HowItWorks() {
     const dx = e.changedTouches[0].clientX - touchStartX.current;
     const dy = e.changedTouches[0].clientY - touchStartY.current;
 
-    // Only treat as horizontal swipe if horizontal movement dominates
     if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
 
     if (dx < 0 && activeIndex < steps.length - 1) {
-      setActiveIndex((i) => i + 1);
+      goTo(activeIndex + 1);
     } else if (dx > 0 && activeIndex > 0) {
-      setActiveIndex((i) => i - 1);
+      goTo(activeIndex - 1);
     }
 
     touchStartX.current = null;
@@ -111,7 +130,6 @@ export default function HowItWorks() {
           display: none;
           position: relative;
           overflow: hidden;
-          /* full-bleed so card fills the viewport width */
           margin: 0 -24px;
           padding: 0;
         }
@@ -123,7 +141,6 @@ export default function HowItWorks() {
         }
 
         .fra-mobile-slide {
-          /* each slide = 100% of the outer container */
           flex: 0 0 100%;
           padding: 0 24px;
           box-sizing: border-box;
@@ -338,7 +355,6 @@ export default function HowItWorks() {
 
         {/* ── Mobile carousel ── */}
         <div className="fra-journey-mobile">
-          {/* Swipeable track */}
           <div
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
@@ -360,7 +376,6 @@ export default function HowItWorks() {
                       ease: [0.22, 1, 0.36, 1],
                     }}
                   >
-                    {/* Top line */}
                     <div
                       style={{
                         display: "flex",
@@ -466,11 +481,11 @@ export default function HowItWorks() {
             </div>
           </div>
 
-          {/* Navigation row: prev arrow · dots · next arrow */}
+          {/* Navigation row */}
           <div className="fra-mobile-arrows">
             <button
               className="fra-mobile-arrow-btn"
-              onClick={() => setActiveIndex((i) => Math.max(0, i - 1))}
+              onClick={() => goTo(Math.max(0, activeIndex - 1))}
               disabled={activeIndex === 0}
               aria-label="Previous step"
             >
@@ -491,9 +506,7 @@ export default function HowItWorks() {
 
             <button
               className="fra-mobile-arrow-btn"
-              onClick={() =>
-                setActiveIndex((i) => Math.min(steps.length - 1, i + 1))
-              }
+              onClick={() => goTo(Math.min(steps.length - 1, activeIndex + 1))}
               disabled={activeIndex === steps.length - 1}
               aria-label="Next step"
             >
@@ -518,10 +531,9 @@ export default function HowItWorks() {
                 aria-selected={i === activeIndex}
                 aria-label={`Go to step ${i + 1}`}
                 className="fra-mobile-dot"
-                onClick={() => setActiveIndex(i)}
+                onClick={() => goTo(i)}
                 style={{
-                  background:
-                    i === activeIndex ? tokens.green900 : "#d1d5db",
+                  background: i === activeIndex ? tokens.green900 : "#d1d5db",
                   width: i === activeIndex ? 20 : 8,
                 }}
               />
@@ -531,7 +543,6 @@ export default function HowItWorks() {
 
       </div>
 
-      {/* Fix outer padding on mobile so carousel bleeds correctly */}
       <style>{`
         @media (max-width: 639px) {
           .fra-outer-pad {

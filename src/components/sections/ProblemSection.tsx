@@ -1,7 +1,7 @@
 import { useInView } from "../../hooks/useAnimations";
 import { tokens } from "../../styles/tokens";
 import { motion } from "framer-motion";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 
 const IconBuild = () => (
   <motion.svg width="48" height="48" viewBox="0 0 48 48" fill="none"
@@ -104,6 +104,7 @@ export default function ProblemSection() {
   const [carouselIndex, setCarouselIndex] = useState(0);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
+  const autoPlayRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const gaps = [
     {
@@ -120,6 +121,25 @@ export default function ProblemSection() {
     },
   ];
 
+  const resetAutoPlay = () => {
+    if (autoPlayRef.current) clearInterval(autoPlayRef.current);
+    autoPlayRef.current = setInterval(() => {
+      setCarouselIndex((i) => (i + 1) % gaps.length);
+    }, 3500);
+  };
+
+  useEffect(() => {
+    resetAutoPlay();
+    return () => {
+      if (autoPlayRef.current) clearInterval(autoPlayRef.current);
+    };
+  }, []);
+
+  const goTo = (index: number) => {
+    setCarouselIndex(index);
+    resetAutoPlay();
+  };
+
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
@@ -133,9 +153,9 @@ export default function ProblemSection() {
     if (Math.abs(dx) < 40 || Math.abs(dx) < Math.abs(dy)) return;
 
     if (dx < 0 && carouselIndex < gaps.length - 1) {
-      setCarouselIndex((i) => i + 1);
+      goTo(carouselIndex + 1);
     } else if (dx > 0 && carouselIndex > 0) {
-      setCarouselIndex((i) => i - 1);
+      goTo(carouselIndex - 1);
     }
 
     touchStartX.current = null;
@@ -306,7 +326,6 @@ export default function ProblemSection() {
                     animate={inView ? { opacity: 1, y: 0 } : {}}
                     transition={{ duration: 0.5, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
                   >
-                    {/* Tap-to-reveal on mobile — toggle activeIndex */}
                     <div
                       role="button" tabIndex={0}
                       aria-pressed={activeIndex === i}
@@ -331,7 +350,7 @@ export default function ProblemSection() {
           {/* Arrows + counter */}
           <div className="fra-problem-mobile-arrows">
             <button className="fra-problem-arrow-btn"
-              onClick={() => setCarouselIndex((i) => Math.max(0, i - 1))}
+              onClick={() => goTo(Math.max(0, carouselIndex - 1))}
               disabled={carouselIndex === 0}
               aria-label="Previous card">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -345,7 +364,7 @@ export default function ProblemSection() {
             </span>
 
             <button className="fra-problem-arrow-btn"
-              onClick={() => setCarouselIndex((i) => Math.min(gaps.length - 1, i + 1))}
+              onClick={() => goTo(Math.min(gaps.length - 1, carouselIndex + 1))}
               disabled={carouselIndex === gaps.length - 1}
               aria-label="Next card">
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -363,7 +382,7 @@ export default function ProblemSection() {
                 aria-selected={i === carouselIndex}
                 aria-label={`Go to card ${i + 1}`}
                 className="fra-problem-dot"
-                onClick={() => setCarouselIndex(i)}
+                onClick={() => goTo(i)}
                 style={{
                   background: i === carouselIndex ? tokens.green900 : "#d1d5db",
                   width: i === carouselIndex ? 20 : 8,
