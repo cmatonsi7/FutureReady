@@ -8,7 +8,7 @@ jobs:
 
     steps:
       - name: Get latest code
-        uses: actions/checkout@v4        # ← updated (v3 deprecated)
+        uses: actions/checkout@v4
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -28,6 +28,8 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          local-dir: ./dist/             # ← relative path
-          server-dir: /public_html/
+          local-dir: ./dist/
+          server-dir: /home/futurey8u1w3/public_html/
+          protocol: ftp
+          port: 21
           dangerous-clean-slate: false
