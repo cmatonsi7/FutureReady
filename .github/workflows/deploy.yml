@@ -29,5 +29,5 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./dist/             # ← relative path
-          server-dir: ./public_html/     
+          server-dir: /home/futurey8u1w3/public_html/ 
           dangerous-clean-slate: false
