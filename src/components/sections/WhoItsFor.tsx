@@ -1,3 +1,5 @@
+
+
 import React, { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useInView } from "../../hooks/useAnimations";
@@ -148,6 +150,7 @@ export default function WhoItsFor() {
 
         .fra-who-mobile-track {
           display: flex;
+          align-items: stretch;
           transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
           will-change: transform;
         }
@@ -156,6 +159,8 @@ export default function WhoItsFor() {
           flex: 0 0 100%;
           padding: 0 20px;
           box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
         }
 
         .fra-who-mobile-arrows {
@@ -235,10 +240,7 @@ export default function WhoItsFor() {
         </div>
 
         {/* Delivery Model strip */}
-        <div
-          className="fra-delivery-strip"
-          style={{ padding: "0 48px", marginBottom: 36 }}
-        >
+        <div className="fra-delivery-strip" style={{ padding: "0 48px", marginBottom: 36 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
             <span
               style={{
@@ -356,9 +358,15 @@ export default function WhoItsFor() {
                   )}
                 </div>
                 <div style={{ marginTop: 28 }}>
-                  <button className="btn btn-amber fra-focus-ring" style={{ width: "100%", justifyContent: "center" }}>
+                  <a
+                    href={card.isOrg ? "#contact" : "https://learn.futurereadyafrica.co.za/courses"}
+                    target={card.isOrg ? undefined : "_blank"}
+                    rel={card.isOrg ? undefined : "noopener noreferrer"}
+                    className="btn btn-amber fra-focus-ring"
+                    style={{ width: "100%", justifyContent: "center", display: "flex" }}
+                  >
                     {card.cta}
-                  </button>
+                  </a>
                 </div>
               </div>
             </motion.div>
@@ -367,11 +375,10 @@ export default function WhoItsFor() {
 
         {/* ── Mobile carousel ── */}
         <div className="fra-who-carousel">
-          {/* Swipeable track */}
           <div
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
-            style={{ overflow: "hidden", margin: "0 0" }}
+            style={{ overflow: "hidden" }}
           >
             <div
               className="fra-who-mobile-track"
@@ -391,6 +398,8 @@ export default function WhoItsFor() {
                       padding: 24,
                       display: "flex",
                       flexDirection: "column",
+                      height: "100%",
+                      boxSizing: "border-box",
                     }}
                   >
                     <div
@@ -453,9 +462,15 @@ export default function WhoItsFor() {
                         )}
                       </div>
                       <div style={{ marginTop: 24 }}>
-                        <button className="btn btn-amber fra-focus-ring" style={{ width: "100%", justifyContent: "center" }}>
+                        <a
+                          href={card.isOrg ? "#contact" : "https://learn.futurereadyafrica.co.za/courses"}
+                          target={card.isOrg ? undefined : "_blank"}
+                          rel={card.isOrg ? undefined : "noopener noreferrer"}
+                          className="btn btn-amber fra-focus-ring"
+                          style={{ width: "100%", justifyContent: "center", display: "flex" }}
+                        >
                           {card.cta}
-                        </button>
+                        </a>
                       </div>
                     </div>
                   </motion.div>
@@ -464,7 +479,7 @@ export default function WhoItsFor() {
             </div>
           </div>
 
-          {/* Navigation row: prev arrow · counter · next arrow */}
+          {/* Navigation row */}
           <div className="fra-who-mobile-arrows">
             <button
               className="fra-who-mobile-arrow-btn"
@@ -473,13 +488,7 @@ export default function WhoItsFor() {
               aria-label="Previous card"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M10 12L6 8l4-4"
-                  stroke={tokens.green900}
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+                <path d="M10 12L6 8l4-4" stroke={tokens.green900} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
 
@@ -494,13 +503,7 @@ export default function WhoItsFor() {
               aria-label="Next card"
             >
               <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path
-                  d="M6 4l4 4-4 4"
-                  stroke={tokens.green900}
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
+                <path d="M6 4l4 4-4 4" stroke={tokens.green900} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
           </div>

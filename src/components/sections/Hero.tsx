@@ -1,3 +1,4 @@
+
 import { motion } from "framer-motion";
 import { siteMedia } from "../../content/siteMedia";
 
@@ -144,10 +145,15 @@ export default function Hero() {
 
           {/* CTAs */}
           <div className="fra-hero-cta-row">
-            <a href="#contact" className="fra-cta-gold fra-focus-ring">
+            <a
+              href="https://learn.futurereadyafrica.co.za/courses"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="fra-cta-gold fra-focus-ring"
+            >
               Enroll Now
             </a>
-            <a href="#how-it-works" className="fra-cta-outline fra-focus-ring">
+            <a href="#contact" className="fra-cta-outline fra-focus-ring">
               Partner With Us
             </a>
           </div>
