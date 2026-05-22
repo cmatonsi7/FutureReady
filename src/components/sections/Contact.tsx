@@ -5,7 +5,7 @@ import { tokens } from "../../styles/tokens";
 import { motion } from "framer-motion";
 
 const WEB3FORMS_KEY = "91b41c61-11e1-43c5-9039-f0c5fc9e74c2";
-const DISCOVERY_PHONE = "+27643298928";
+
 
 /* ─── SVG VECTOR ICONS ──────────────────────────────────────── */
 const IconPin = () => (
@@ -200,31 +200,7 @@ export default function Contact() {
     return res.json();
   };
 
-  /* ─── Org submit ─────────────────────────────────────────── */
-//   const handleOrgSubmit = async () => {
-//     const errs = validateOrg();
-//     if (Object.keys(errs).length) { setOrgErrors(errs); return; }
-//     setOrgErrors({});
-//     setOrgStatus("loading");
-//     try {
-//       const data = await submitToWeb3Forms({
-//         subject: "Organisation Enquiry",
-//         name: orgFields.name,
-//         email: orgFields.email,
-//         message: `
-// Organisation: ${orgFields.orgName}
-// Role: ${orgFields.role}
-// Est. Participants: ${orgFields.participants}
-// Package: ${orgPackage}
-
-// ${orgFields.message}
-//         `.trim(),
-//       });
-//       setOrgStatus(data.success ? "success" : "error");
-//     } catch {
-//       setOrgStatus("error");
-//     }
-//   };
+ 
 
   /* ─── Discovery call: submit form THEN dial ──────────────── */
 const handleDiscoveryCall = async () => {
