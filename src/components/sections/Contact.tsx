@@ -4,7 +4,7 @@ import { useInView } from "../../hooks/useAnimations";
 import { tokens } from "../../styles/tokens";
 import { motion } from "framer-motion";
 
-const WEB3FORMS_KEY = "5633eba1-0c7b-4e47-8426-5bef6e01ed9a";
+const WEB3FORMS_KEY = "91b41c61-11e1-43c5-9039-f0c5fc9e74c2";
 const DISCOVERY_PHONE = "+27643298928";
 
 /* ─── SVG VECTOR ICONS ──────────────────────────────────────── */
@@ -227,59 +227,109 @@ export default function Contact() {
 //   };
 
   /* ─── Discovery call: submit form THEN dial ──────────────── */
-  const handleDiscoveryCall = async () => {
-    const errs = validateOrg();
-    if (Object.keys(errs).length) { setOrgErrors(errs); return; }
-    setOrgErrors({});
-    setOrgStatus("loading");
-    try {
-      const data = await submitToWeb3Forms({
-        subject: "Discovery Call Request",
-        name: orgFields.name,
-        email: orgFields.email,
-        message: `
+const handleDiscoveryCall = async () => {
+  const errs = validateOrg();
+
+  if (Object.keys(errs).length) {
+    setOrgErrors(errs);
+    return;
+  }
+
+  setOrgErrors({});
+  setOrgStatus("loading");
+
+  try {
+    const data = await submitToWeb3Forms({
+      subject: "Individual Enrolment Enquiry",
+      name: orgFields.name,
+      email: orgFields.email,
+      message: `
 [DISCOVERY CALL REQUESTED]
+
 Organisation: ${orgFields.orgName}
 Role: ${orgFields.role}
 Est. Participants: ${orgFields.participants}
 Package: ${orgPackage}
 
 ${orgFields.message}
-        `.trim(),
+      `.trim(),
+    });
+
+    if (data.success) {
+      setOrgStatus("success");
+
+      // CLEAR FORM
+      setOrgFields({
+        orgName: "",
+        name: "",
+        role: "",
+        participants: "",
+        email: "",
+        message: "",
       });
-      setOrgStatus(data.success ? "success" : "error");
-      // Initiate the call regardless of submission result
-      window.location.href = `tel:${DISCOVERY_PHONE}`;
-    } catch {
+
+      setOrgPackage("");
+      setOrgErrors({});
+    } else {
       setOrgStatus("error");
-      window.location.href = `tel:${DISCOVERY_PHONE}`;
     }
-  };
+  } catch (error) {
+    console.error(error);
+    setOrgStatus("error");
+  }
+};
 
   /* ─── Ind submit ─────────────────────────────────────────── */
   const handleIndSubmit = async () => {
-    const errs = validateInd();
-    if (Object.keys(errs).length) { setIndErrors(errs); return; }
-    setIndErrors({});
-    setIndStatus("loading");
-    try {
-      const data = await submitToWeb3Forms({
-        subject: "Individual Enrolment Enquiry",
-        name: indFields.name,
-        email: indFields.email,
-        message: `
+  const errs = validateInd();
+
+  if (Object.keys(errs).length) {
+    setIndErrors(errs);
+    return;
+  }
+
+  setIndErrors({});
+  setIndStatus("loading");
+
+  try {
+    const data = await submitToWeb3Forms({
+      subject: "Individual Enrolment Enquiry",
+      name: indFields.name,
+      email: indFields.email,
+      message: `
 Phone: ${indFields.phone}
 Payment Plan: ${indPackage}
 Heard via: ${indFields.source}
 
 ${indFields.message}
-        `.trim(),
+      `.trim(),
+    });
+
+    if (data.success) {
+      setIndStatus("success");
+
+      // CLEAR FORM
+      setIndFields({
+        name: "",
+        phone: "",
+        email: "",
+        source: "",
+        message: "",
       });
-      setIndStatus(data.success ? "success" : "error");
-    } catch {
+
+      // CLEAR PACKAGE
+      setIndPackage("");
+
+      // CLEAR ERRORS
+      setIndErrors({});
+    } else {
       setIndStatus("error");
     }
-  };
+  } catch (error) {
+    console.error(error);
+    setIndStatus("error");
+  }
+};
 
   /* ─── Feedback banner ───────────────────────────────────── */
   const StatusBanner = ({ status, onReset }: { status: SubmitStatus; onReset: () => void }) => {
@@ -557,22 +607,36 @@ ${indFields.message}
 
                 {/* ── Discovery call button ── */}
                 {orgStatus !== "success" && (
+                  // <button
+                  //   type="button"
+                  //   className="btn btn-amber"
+                  //   onClick={handleDiscoveryCall}
+                  //   disabled={orgStatus === "loading"}
+                  //   style={{
+                  //     width: "100%", justifyContent: "center",
+                  //     padding: "16px", fontSize: 15, marginTop: 4,
+                  //     opacity: orgStatus === "loading" ? 0.7 : 1,
+                  //     cursor: orgStatus === "loading" ? "wait" : "pointer",
+  
+                  //     border: "1px solid rgba(255,255,255,0.2)",
+                     
+                  //   }}
+                  // >
+                  //   {orgStatus === "loading" ? "Sending…" : "Book a Disco Call →"}
+                  // </button>
                   <button
                     type="button"
                     className="btn btn-amber"
                     onClick={handleDiscoveryCall}
-                    disabled={orgStatus === "loading"}
+                    disabled={indStatus === "loading"}
                     style={{
                       width: "100%", justifyContent: "center",
-                      padding: "16px", fontSize: 15, marginTop: 4,
-                      opacity: orgStatus === "loading" ? 0.7 : 1,
-                      cursor: orgStatus === "loading" ? "wait" : "pointer",
-  
-                      border: "1px solid rgba(255,255,255,0.2)",
-                     
+                      padding: "16px", fontSize: 15, marginTop: 8,
+                      opacity: indStatus === "loading" ? 0.7 : 1,
+                      cursor: indStatus === "loading" ? "wait" : "pointer",
                     }}
                   >
-                    {orgStatus === "loading" ? "Sending…" : "Book a Discovery Call →"}
+                    {indStatus === "loading" ? "Sending…" : "Submit→"}
                   </button>
                 )}
               </div>
@@ -672,7 +736,7 @@ ${indFields.message}
                       cursor: indStatus === "loading" ? "wait" : "pointer",
                     }}
                   >
-                    {indStatus === "loading" ? "Sending…" : "Submit →"}
+                    {indStatus === "loading" ? "Sending…" : "Submit→"}
                   </button>
                 )}
               </div>
